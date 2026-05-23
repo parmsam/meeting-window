@@ -36,3 +36,5 @@ Do not simplify this to `new Date().getTimezoneOffset()` — that only returns t
 
 - After any meaningful change (feature, fix, content update): commit with a descriptive message and push to `origin main`. GitHub Pages redeploys automatically.
 - Keep all logic in the four existing files — do not introduce a build tool, bundler, or npm dependency.
+- **Keep `README.md` up to date.** It is user-facing documentation. When adding features, changing the URL format, modifying the city database workflow, or updating agent access (`llms.txt`, `cities.json`), reflect those changes in `README.md` in the same commit.
+- When `cities.js` changes, regenerate `cities.json` (see README for the one-liner).
