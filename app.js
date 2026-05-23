@@ -322,8 +322,8 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-function downloadImage() {
-  if (!cityA || !cityB) return;
+function buildCanvas() {
+  if (!cityA || !cityB) return null;
   const dark = isDarkActive();
   const pal  = dark
     ? { bg: '#0f172a', card: '#1e293b', text: '#f1f5f9', muted: '#94a3b8', track: '#111827' }
@@ -453,10 +453,36 @@ function downloadImage() {
   ctx.textAlign = 'right';
   ctx.fillText('parmsam.github.io/meeting-window', W - PAD, H - 10);
 
+  return canvas;
+}
+
+function downloadImage() {
+  const canvas = buildCanvas();
+  if (!canvas) return;
   const a = document.createElement('a');
   a.download = 'meeting-window.png';
   a.href = canvas.toDataURL('image/png');
   a.click();
+}
+
+async function copyImageToClipboard() {
+  const canvas = buildCanvas();
+  if (!canvas) return;
+  const btn = document.getElementById('copy-img-btn');
+  try {
+    await new Promise((resolve, reject) => {
+      canvas.toBlob(blob => {
+        if (!blob) { reject(new Error('toBlob failed')); return; }
+        navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+          .then(resolve).catch(reject);
+      }, 'image/png');
+    });
+    if (btn) { btn.textContent = 'Copied!'; setTimeout(() => { btn.textContent = 'Copy image'; }, 2000); }
+  } catch {
+    // Clipboard API not available — fall back to download
+    downloadImage();
+    if (btn) { btn.textContent = 'Saved instead'; setTimeout(() => { btn.textContent = 'Copy image'; }, 2000); }
+  }
 }
 
 // ── Timeline ──────────────────────────────────────────────────────────────────
@@ -585,8 +611,9 @@ function render() {
     ${renderTimeline(now, cityWindows, overlap)}
   </div>
   <div class="card-actions">
-    <button id="share-btn" class="action-btn">Share link</button>
-    <button id="dl-btn"    class="action-btn">Download image</button>
+    <button id="share-btn"    class="action-btn">Share link</button>
+    <button id="dl-btn"       class="action-btn">Download image</button>
+    <button id="copy-img-btn" class="action-btn">Copy image</button>
   </div>
 </div>`;
 
@@ -598,6 +625,7 @@ function render() {
     });
   });
   document.getElementById('dl-btn').addEventListener('click', downloadImage);
+  document.getElementById('copy-img-btn').addEventListener('click', copyImageToClipboard);
 
   tickLiveTimes(allCities);
 }
