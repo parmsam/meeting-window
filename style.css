@@ -344,6 +344,87 @@ h1 {
   box-shadow: 0 1px 3px rgba(0,0,0,.08);
 }
 
+/* ── Settings row ── */
+
+.settings-row {
+  display: flex;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.settings-lbl {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.date-wrap {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+#date-input {
+  padding: 0.42rem 0.6rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  background: var(--card);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.12s;
+  font-family: inherit;
+}
+
+#date-input:focus { border-color: var(--a); }
+
+.today-btn {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  color: var(--muted);
+  white-space: nowrap;
+  transition: border-color 0.12s, color 0.12s;
+}
+
+.today-btn:hover { border-color: var(--a); color: var(--a); }
+
+.hours-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.hours-dash { color: var(--muted); font-size: 0.85rem; }
+
+.hour-select {
+  padding: 0.42rem 0.45rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  background: var(--card);
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.12s;
+  font-family: inherit;
+}
+
+.hour-select:focus { border-color: var(--a); }
+
 /* ── Simple view ── */
 
 .simple-times-block {

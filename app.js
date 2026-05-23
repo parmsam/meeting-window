@@ -27,9 +27,10 @@ function toggleTheme() {
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const WORK_START = 8;
-const WORK_END   = 17;
-const MAX_COMP   = 8; // max comparison cities (plus the anchor = 9 total)
+let workStart = 8;
+let workEnd   = 17;
+let selectedDate = null; // null = today; Date object = specific day (noon UTC)
+const MAX_COMP = 8; // max comparison cities (plus the anchor = 9 total)
 
 // Colors: index 0 = anchor city (always blue), 1..4 = comparison slots
 const CITY_COLORS = ['#2563eb', '#059669', '#d97706', '#0891b2', '#db2777', '#7c3aed', '#b45309', '#0e7490', '#be185d'];
@@ -98,8 +99,8 @@ function localHourToUTC(refDate, hour, tz) {
 
 function getBusinessWindow(refDate, tz) {
   return {
-    start: localHourToUTC(refDate, WORK_START, tz).getTime(),
-    end:   localHourToUTC(refDate, WORK_END,   tz).getTime()
+    start: localHourToUTC(refDate, workStart, tz).getTime(),
+    end:   localHourToUTC(refDate, workEnd,   tz).getTime()
   };
 }
 
@@ -365,12 +366,26 @@ function updateAddBtn() {
 
 // ── URL sharing ───────────────────────────────────────────────────────────────
 
+function getTodayStr() {
+  const n = new Date();
+  return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
+}
+
+function dateToISO(d) { return d.toISOString().slice(0, 10); }
+
+function isToday() { return !selectedDate; }
+
 function updateURL() {
   const cities = [cityA, cityB, ...extraCities.map(e => e.city)].filter(Boolean);
-  const params = viewMode === 'simple' ? '?mode=simple' : '';
-  if (!cities.length) { history.replaceState(null, '', location.pathname + params); return; }
+  const params = new URLSearchParams();
+  if (viewMode === 'simple') params.set('mode', 'simple');
+  if (selectedDate) params.set('date', dateToISO(selectedDate));
+  if (workStart !== 8) params.set('start', workStart);
+  if (workEnd !== 17)  params.set('end',   workEnd);
+  const qs = params.toString() ? '?' + params.toString() : '';
+  if (!cities.length) { history.replaceState(null, '', location.pathname + qs); return; }
   const hash = cities.map(c => `${encodeURIComponent(c.name)},${c.country}`).join('|');
-  history.replaceState(null, '', `${params}#${hash}`);
+  history.replaceState(null, '', `${qs}#${hash}`);
 }
 
 function parseURL() {
@@ -409,9 +424,9 @@ function buildCanvas() {
     : { bg: '#f8fafc', card: '#ffffff', text: '#0f172a', muted: '#64748b', track: '#f1f5f9' };
 
   const allCities = [cityA, cityB, ...extraCities.map(e => e.city)].filter(Boolean);
-  const now       = new Date();
-  const windows   = allCities.map(c => getBusinessWindow(now, c.tz));
-  const midnightA = localHourToUTC(now, 0, cityA.tz).getTime();
+  const refDate   = selectedDate ?? new Date();
+  const windows   = allCities.map(c => getBusinessWindow(refDate, c.tz));
+  const midnightA = localHourToUTC(refDate, 0, cityA.tz).getTime();
   const dayMs     = 24 * 3600000;
   const pct       = (ms) => Math.max(0, Math.min(1, (ms - midnightA) / dayMs));
 
@@ -568,8 +583,8 @@ async function copyImageToClipboard() {
 
 // ── Timeline ──────────────────────────────────────────────────────────────────
 
-function renderTimeline(now, cityWindows, overlap) {
-  const midnightA = localHourToUTC(now, 0, cityA.tz).getTime();
+function renderTimeline(refDate, now, cityWindows, overlap) {
+  const midnightA = localHourToUTC(refDate, 0, cityA.tz).getTime();
   const dayMs = 24 * 3600000;
 
   function pct(ms) { return ((ms - midnightA) / dayMs * 100); }
@@ -591,7 +606,7 @@ function renderTimeline(now, cityWindows, overlap) {
   }).join('');
 
   const nowPct = pct(now.getTime());
-  const nowLine = (nowPct >= 0 && nowPct <= 100)
+  const nowLine = isToday() && (nowPct >= 0 && nowPct <= 100)
     ? `<div class="now-line" style="left:${nowPct.toFixed(2)}%"><div class="now-dot"></div></div>`
     : '';
 
@@ -629,7 +644,8 @@ function renderTimeline(now, cityWindows, overlap) {
 // ── Simple view ───────────────────────────────────────────────────────────────
 
 function renderSimple(allCities, allWins, overlap, overlapHrs) {
-  const now = new Date();
+  const now     = new Date();
+  const refDate = selectedDate ?? now;
 
   const timeRows = allCities.map((city, i) => `
     <div class="simple-row">
@@ -644,12 +660,12 @@ function renderSimple(allCities, allWins, overlap, overlapHrs) {
   // Minimal single bar: show where the overlap sits within the anchor's day
   let barHtml = '';
   if (overlap && cityA) {
-    const midnightA = localHourToUTC(now, 0, cityA.tz).getTime();
+    const midnightA = localHourToUTC(refDate, 0, cityA.tz).getTime();
     const dayMs = 24 * 3600000;
     const l = ((overlap.start - midnightA) / dayMs * 100).toFixed(2);
     const w = ((overlap.end - overlap.start) / dayMs * 100).toFixed(2);
     const nowPct = ((now.getTime() - midnightA) / dayMs * 100);
-    const nowLine = nowPct >= 0 && nowPct <= 100
+    const nowLine = isToday() && nowPct >= 0 && nowPct <= 100
       ? `<div class="now-line" style="left:${nowPct.toFixed(2)}%"><div class="now-dot"></div></div>` : '';
     barHtml = `
       <div class="simple-bar-wrap">
@@ -699,9 +715,10 @@ function render() {
     return;
   }
 
-  const now = new Date();
-  const anchorW  = getBusinessWindow(now, cityA.tz);
-  const compWins = comp.map(c => getBusinessWindow(now, c.tz));
+  const now     = new Date();
+  const refDate = selectedDate ?? now;
+  const anchorW  = getBusinessWindow(refDate, cityA.tz);
+  const compWins = comp.map(c => getBusinessWindow(refDate, c.tz));
 
   // Global overlap: intersection of anchor + all comparison windows
   const allWins = [anchorW, ...compWins];
@@ -736,12 +753,12 @@ function render() {
   let summaryHtml;
   if (comp.length === 1 && cityA.tz === comp[0].tz) {
     summaryHtml = `
-      <div class="overlap-num">9h overlap</div>
+      <div class="overlap-num">${fmtHours(workEnd - workStart)} overlap</div>
       <div class="overlap-times">
         <div class="ot-row">
           <span class="dot dot-a"></span>
           <span class="ot-city">${cityA.name} &amp; ${comp[0].name}</span>
-          <span class="ot-range">8:00 AM – 5:00 PM (same timezone)</span>
+          <span class="ot-range">${fmtTime(anchorW.start, cityA.tz)} – ${fmtTime(anchorW.end, cityA.tz)} (same timezone)</span>
         </div>
       </div>`;
   } else if (hasOverlap) {
@@ -768,7 +785,7 @@ function render() {
     ${summaryHtml}
   </div>
   <div class="card-timeline">
-    ${renderTimeline(now, cityWindows, overlap)}
+    ${renderTimeline(refDate, now, cityWindows, overlap)}
   </div>
   <div class="card-actions">
     <button id="share-btn"    class="action-btn">Share link</button>
@@ -803,10 +820,62 @@ function tickLiveTimes(allCities) {
   if (lt && cityA) lt.textContent = fmtCurrentTime(cityA.tz);
 }
 
+// ── Settings ──────────────────────────────────────────────────────────────────
+
+function fmtHourLabel(h) {
+  if (h === 0) return '12 AM';
+  if (h === 12) return '12 PM';
+  return h < 12 ? `${h} AM` : `${h - 12} PM`;
+}
+
+function buildHourOptions() {
+  const startSel = document.getElementById('work-start-select');
+  const endSel   = document.getElementById('work-end-select');
+  if (!startSel || !endSel) return;
+  startSel.innerHTML = Array.from({length: 23}, (_, i) =>
+    `<option value="${i}">${fmtHourLabel(i)}</option>`).join(''); // 0–22
+  endSel.innerHTML = Array.from({length: 23}, (_, i) =>
+    `<option value="${i+1}">${fmtHourLabel(i+1)}</option>`).join(''); // 1–23
+}
+
+function initSettings() {
+  const params = new URLSearchParams(location.search);
+
+  const sp = parseInt(params.get('start'), 10);
+  const ep = parseInt(params.get('end'), 10);
+  if (!isNaN(sp) && sp >= 0 && sp <= 22) {
+    workStart = sp;
+  } else {
+    const ls = parseInt(localStorage.getItem('workStart'), 10);
+    if (!isNaN(ls) && ls >= 0 && ls <= 22) workStart = ls;
+  }
+  if (!isNaN(ep) && ep >= 1 && ep <= 23 && ep > workStart) {
+    workEnd = ep;
+  } else {
+    const le = parseInt(localStorage.getItem('workEnd'), 10);
+    if (!isNaN(le) && le >= 1 && le <= 23 && le > workStart) workEnd = le;
+  }
+
+  const dateParam = params.get('date');
+  if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+    const d = new Date(dateParam + 'T12:00:00Z');
+    if (!isNaN(d.getTime())) selectedDate = d;
+  }
+
+  buildHourOptions();
+  const startSel = document.getElementById('work-start-select');
+  const endSel   = document.getElementById('work-end-select');
+  const dateInp  = document.getElementById('date-input');
+  if (startSel) startSel.value = workStart;
+  if (endSel)   endSel.value   = workEnd;
+  if (dateInp)  dateInp.value  = selectedDate ? dateToISO(selectedDate) : getTodayStr();
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
   initViewMode();
+  initSettings();
   updateThemeBtn();
   updateViewToggle();
 
@@ -834,6 +903,46 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('add-city-btn').addEventListener('click', () => addExtraCity());
+
+  document.getElementById('date-input').addEventListener('change', e => {
+    const v = e.target.value;
+    if (!v) {
+      selectedDate = null;
+    } else {
+      const d = new Date(v + 'T12:00:00Z');
+      selectedDate = isNaN(d.getTime()) ? null : d;
+    }
+    updateURL();
+    render();
+  });
+
+  document.getElementById('today-btn').addEventListener('click', () => {
+    selectedDate = null;
+    document.getElementById('date-input').value = getTodayStr();
+    updateURL();
+    render();
+  });
+
+  document.getElementById('work-start-select').addEventListener('change', e => {
+    workStart = parseInt(e.target.value, 10);
+    if (workEnd <= workStart) {
+      workEnd = workStart + 1;
+      document.getElementById('work-end-select').value = workEnd;
+    }
+    localStorage.setItem('workStart', workStart);
+    localStorage.setItem('workEnd', workEnd);
+    updateURL();
+    render();
+  });
+
+  document.getElementById('work-end-select').addEventListener('change', e => {
+    const v = parseInt(e.target.value, 10);
+    if (v <= workStart) return;
+    workEnd = v;
+    localStorage.setItem('workEnd', workEnd);
+    updateURL();
+    render();
+  });
 
   // Restore from URL or auto-detect user city
   const fromURL = parseURL();

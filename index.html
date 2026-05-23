@@ -36,7 +36,7 @@
         <button id="theme-btn" title="Toggle dark mode" aria-label="Toggle dark mode">☾</button>
       </div>
       <h1>Meeting Window</h1>
-      <p class="tagline">Find overlapping 9–5 hours between two cities</p>
+      <p class="tagline">Find overlapping business hours between cities</p>
     </header>
 
     <main>
@@ -62,6 +62,24 @@
         <button id="add-city-btn" class="add-city-btn">+ Add city</button>
       </div>
 
+      <div class="settings-row">
+        <div class="settings-group">
+          <label class="settings-lbl" for="date-input">Date</label>
+          <div class="date-wrap">
+            <input type="date" id="date-input">
+            <button id="today-btn" class="today-btn">Today</button>
+          </div>
+        </div>
+        <div class="settings-group">
+          <label class="settings-lbl">Business hours</label>
+          <div class="hours-wrap">
+            <select id="work-start-select" class="hour-select"></select>
+            <span class="hours-dash">–</span>
+            <select id="work-end-select" class="hour-select"></select>
+          </div>
+        </div>
+      </div>
+
       <div class="view-toggle" id="view-toggle">
         <button class="view-btn active" data-mode="full">Full</button>
         <button class="view-btn"        data-mode="simple">Simple</button>
@@ -74,7 +92,7 @@
 
     <footer>
       <a href="https://github.com/parmsam/meeting-window" target="_blank" rel="noopener">GitHub</a>
-      &middot; 8 AM – 5 PM business hours &middot; Updates every minute
+      &middot; Updates every minute
     </footer>
   </div>
 
