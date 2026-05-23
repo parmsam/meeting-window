@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meeting Window</title>
+  <meta name="description" content="Find the overlapping business hours between two cities worldwide.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Meeting Window</h1>
+      <p class="tagline">Find overlapping 9–5 hours between two cities</p>
+    </header>
+
+    <main>
+      <div class="pickers">
+        <div class="picker">
+          <label for="input-a">Your city</label>
+          <input type="text" id="input-a" placeholder="e.g. New York" autocomplete="off" spellcheck="false">
+          <ul class="picker-list" id="list-a" hidden></ul>
+        </div>
+
+        <button id="swap-btn" title="Swap cities">⇄</button>
+
+        <div class="picker">
+          <label for="input-b">Their city</label>
+          <input type="text" id="input-b" placeholder="e.g. Tokyo" autocomplete="off" spellcheck="false">
+          <ul class="picker-list" id="list-b" hidden></ul>
+        </div>
+      </div>
+
+      <div id="result">
+        <p class="hint">Select both cities to find the meeting window.</p>
+      </div>
+    </main>
+
+    <footer>
+      <a href="https://github.com/parmsam/meeting-window" target="_blank" rel="noopener">GitHub</a>
+      &middot; 8 AM – 5 PM business hours &middot; Updates every minute
+    </footer>
+  </div>
+
+  <script src="cities.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
