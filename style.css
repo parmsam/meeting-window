@@ -70,13 +70,33 @@ body {
 header {
   text-align: center;
   margin-bottom: 2.25rem;
-  position: relative;
+}
+
+.header-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+#github-link {
+  display: flex;
+  align-items: center;
+  padding: 0.3rem 0.4rem;
+  color: var(--muted);
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  text-decoration: none;
+  transition: border-color 0.12s, color 0.12s;
+}
+
+#github-link:hover {
+  border-color: var(--a);
+  color: var(--a);
 }
 
 #theme-btn {
-  position: absolute;
-  top: 0;
-  right: 0;
   background: none;
   border: 1.5px solid var(--border);
   border-radius: 7px;
@@ -207,6 +227,69 @@ h1 {
   border-color: var(--a);
   color: var(--a);
 }
+
+/* ── Extra pickers ── */
+
+#extra-pickers { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.25rem; }
+
+.extra-picker-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.extra-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-bottom: 10px;
+}
+
+.extra-picker-input input {
+  width: 100%;
+  padding: 0.55rem 0.8rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: var(--card);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.12s;
+}
+
+.extra-picker-input input:focus { border-color: var(--a); }
+
+.remove-city-btn {
+  flex-shrink: 0;
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: var(--muted);
+  line-height: 1;
+  margin-bottom: 1px;
+  transition: border-color 0.12s, color 0.12s;
+}
+
+.remove-city-btn:hover { border-color: var(--none); color: var(--none); }
+
+.picker-footer { margin-bottom: 1rem; }
+
+.add-city-btn {
+  background: none;
+  border: 1.5px dashed var(--border);
+  border-radius: 8px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: var(--muted);
+  transition: border-color 0.12s, color 0.12s;
+}
+
+.add-city-btn:hover { border-color: var(--a); color: var(--a); }
 
 /* ── Result ── */
 
@@ -403,6 +486,28 @@ h1 {
   margin-top: 0.4rem;
   text-align: right;
 }
+
+/* ── Card actions ── */
+
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.action-btn {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: var(--muted);
+  transition: border-color 0.12s, color 0.12s;
+}
+
+.action-btn:hover { border-color: var(--a); color: var(--a); }
 
 /* ── Legend ── */
 
