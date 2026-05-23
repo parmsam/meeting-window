@@ -130,6 +130,251 @@
     "tz": "America/Anchorage"
   },
   {
+    "name": "Albuquerque",
+    "country": "US",
+    "tz": "America/Denver"
+  },
+  {
+    "name": "Baltimore",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
+    "name": "Bangor",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
+    "name": "Billings",
+    "country": "US",
+    "tz": "America/Denver"
+  },
+  {
+    "name": "Birmingham",
+    "country": "US",
+    "tz": "America/Chicago"
+  },
+  {
+    "name": "Boise",
+    "country": "US",
+    "tz": "America/Boise"
+  },
+  {
+    "name": "Buffalo",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
+    "name": "Burlington",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
+    "name": "Charleston",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
+    "name": "Cheyenne",
+    "country": "US",
+    "tz": "America/Denver"
+  },
+  {
+    "name": "Cincinnati",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
+    "name": "Cleveland",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
+    "name": "Columbia",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
+    "name": "Columbus",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
+    "name": "Des Moines",
+    "country": "US",
+    "tz": "America/Chicago"
+  },
+  {
+    "name": "El Paso",
+    "country": "US",
+    "tz": "America/Denver"
+  },
+  {
+    "name": "Fargo",
+    "country": "US",
+    "tz": "America/Chicago"
+  },
+  {
+    "name": "Grand Rapids",
+    "country": "US",
+    "tz": "America/Detroit"
+  },
+  {
+    "name": "Hartford",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
+    "name": "Indianapolis",
+    "country": "US",
+    "tz": "America/Indiana/Indianapolis"
+  },
+  {
+    "name": "Jackson",
+    "country": "US",
+    "tz": "America/Chicago"
+  },
+  {
+    "name": "Jacksonville",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
+    "name": "Kansas City",
+    "country": "US",
+    "tz": "America/Chicago"
+  },
+  {
+    "name": "Lexington",
+    "country": "US",
+    "tz": "America/Kentucky/Louisville"
+  },
+  {
+    "name": "Little Rock",
+    "country": "US",
+    "tz": "America/Chicago"
+  },
+  {
+    "name": "Louisville",
+    "country": "US",
+    "tz": "America/Kentucky/Louisville"
+  },
+  {
+    "name": "Manchester",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
+    "name": "Memphis",
+    "country": "US",
+    "tz": "America/Chicago"
+  },
+  {
+    "name": "Milwaukee",
+    "country": "US",
+    "tz": "America/Chicago"
+  },
+  {
+    "name": "New Orleans",
+    "country": "US",
+    "tz": "America/Chicago"
+  },
+  {
+    "name": "Newark",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
+    "name": "Oklahoma City",
+    "country": "US",
+    "tz": "America/Chicago"
+  },
+  {
+    "name": "Omaha",
+    "country": "US",
+    "tz": "America/Chicago"
+  },
+  {
+    "name": "Orlando",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
+    "name": "Pittsburgh",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
+    "name": "Providence",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
+    "name": "Reno",
+    "country": "US",
+    "tz": "America/Los_Angeles"
+  },
+  {
+    "name": "Richmond",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
+    "name": "Sacramento",
+    "country": "US",
+    "tz": "America/Los_Angeles"
+  },
+  {
+    "name": "San Francisco",
+    "country": "US",
+    "tz": "America/Los_Angeles"
+  },
+  {
+    "name": "Sioux Falls",
+    "country": "US",
+    "tz": "America/Chicago"
+  },
+  {
+    "name": "Spokane",
+    "country": "US",
+    "tz": "America/Los_Angeles"
+  },
+  {
+    "name": "St. Louis",
+    "country": "US",
+    "tz": "America/Chicago"
+  },
+  {
+    "name": "Tampa",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
+    "name": "Tucson",
+    "country": "US",
+    "tz": "America/Phoenix"
+  },
+  {
+    "name": "Virginia Beach",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
+    "name": "Washington DC",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
+    "name": "Wichita",
+    "country": "US",
+    "tz": "America/Chicago"
+  },
+  {
+    "name": "Wilmington",
+    "country": "US",
+    "tz": "America/New_York"
+  },
+  {
     "name": "Toronto",
     "country": "CA",
     "tz": "America/Toronto"
