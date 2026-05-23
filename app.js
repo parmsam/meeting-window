@@ -29,10 +29,10 @@ function toggleTheme() {
 
 const WORK_START = 8;
 const WORK_END   = 17;
-const MAX_COMP   = 4; // max comparison cities (plus the anchor = 5 total)
+const MAX_COMP   = 8; // max comparison cities (plus the anchor = 9 total)
 
 // Colors: index 0 = anchor city (always blue), 1..4 = comparison slots
-const CITY_COLORS = ['#2563eb', '#059669', '#d97706', '#0891b2', '#db2777'];
+const CITY_COLORS = ['#2563eb', '#059669', '#d97706', '#0891b2', '#db2777', '#7c3aed', '#b45309', '#0e7490', '#be185d'];
 const OVERLAP_COLOR = '#7c3aed';
 
 // ── State ─────────────────────────────────────────────────────────────────────
