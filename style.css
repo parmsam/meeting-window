@@ -314,6 +314,96 @@ h1 {
 
 .add-city-btn:hover { border-color: var(--a); color: var(--a); }
 
+/* ── View toggle ── */
+
+.view-toggle {
+  display: flex;
+  gap: 2px;
+  background: var(--track-bg);
+  border-radius: 8px;
+  padding: 3px;
+  width: fit-content;
+  margin-bottom: 1rem;
+}
+
+.view-btn {
+  background: none;
+  border: none;
+  border-radius: 6px;
+  padding: 0.3rem 0.85rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: var(--muted);
+  transition: background 0.12s, color 0.12s;
+}
+
+.view-btn.active {
+  background: var(--card);
+  color: var(--text);
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+
+/* ── Simple view ── */
+
+.simple-times-block {
+  padding: 0 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.simple-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.simple-city { font-weight: 500; min-width: 90px; }
+
+.simple-tz {
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  flex: 1;
+}
+
+.simple-time {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.simple-bar-wrap {
+  padding: 0 1.5rem 1.25rem;
+}
+
+.simple-bar-track {
+  height: 10px;
+  background: var(--track-bg);
+  border-radius: 99px;
+  position: relative;
+}
+
+.simple-bar-fill {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: var(--overlap);
+  border-radius: 99px;
+  opacity: 0.85;
+}
+
+.simple-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  color: var(--muted);
+  margin-top: 0.3rem;
+  font-variant-numeric: tabular-nums;
+}
+
 /* ── Result ── */
 
 .hint {

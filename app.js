@@ -35,6 +35,31 @@ const MAX_COMP   = 8; // max comparison cities (plus the anchor = 9 total)
 const CITY_COLORS = ['#2563eb', '#059669', '#d97706', '#0891b2', '#db2777', '#7c3aed', '#b45309', '#0e7490', '#be185d'];
 const OVERLAP_COLOR = '#7c3aed';
 
+// ── View mode ─────────────────────────────────────────────────────────────────
+
+let viewMode = 'full'; // 'simple' | 'full'
+
+function initViewMode() {
+  const param = new URLSearchParams(location.search).get('mode');
+  viewMode = param === 'simple' ? 'simple'
+           : param === 'full'   ? 'full'
+           : (localStorage.getItem('viewMode') ?? 'full');
+}
+
+function setViewMode(mode) {
+  viewMode = mode;
+  localStorage.setItem('viewMode', mode);
+  updateURL();
+  updateViewToggle();
+  render();
+}
+
+function updateViewToggle() {
+  document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mode === viewMode);
+  });
+}
+
 // ── State ─────────────────────────────────────────────────────────────────────
 
 let cityA      = null; // anchor ("your city")
@@ -342,9 +367,10 @@ function updateAddBtn() {
 
 function updateURL() {
   const cities = [cityA, cityB, ...extraCities.map(e => e.city)].filter(Boolean);
-  if (!cities.length) { history.replaceState(null, '', location.pathname); return; }
+  const params = viewMode === 'simple' ? '?mode=simple' : '';
+  if (!cities.length) { history.replaceState(null, '', location.pathname + params); return; }
   const hash = cities.map(c => `${encodeURIComponent(c.name)},${c.country}`).join('|');
-  history.replaceState(null, '', `#${hash}`);
+  history.replaceState(null, '', `${params}#${hash}`);
 }
 
 function parseURL() {
@@ -600,6 +626,68 @@ function renderTimeline(now, cityWindows, overlap) {
 </div>`;
 }
 
+// ── Simple view ───────────────────────────────────────────────────────────────
+
+function renderSimple(allCities, allWins, overlap, overlapHrs) {
+  const now = new Date();
+
+  const timeRows = allCities.map((city, i) => `
+    <div class="simple-row">
+      <span class="dot" style="background:${CITY_COLORS[i] ?? CITY_COLORS[CITY_COLORS.length-1]}"></span>
+      <span class="simple-city">${city.name}</span>
+      <span class="simple-tz">${tzLabel(city.tz)}</span>
+      <span class="simple-time">${overlap
+        ? `${fmtTime(overlap.start, city.tz)} – ${fmtTime(overlap.end, city.tz)}`
+        : fmtCurrentTime(city.tz)}</span>
+    </div>`).join('');
+
+  // Minimal single bar: show where the overlap sits within the anchor's day
+  let barHtml = '';
+  if (overlap && cityA) {
+    const midnightA = localHourToUTC(now, 0, cityA.tz).getTime();
+    const dayMs = 24 * 3600000;
+    const l = ((overlap.start - midnightA) / dayMs * 100).toFixed(2);
+    const w = ((overlap.end - overlap.start) / dayMs * 100).toFixed(2);
+    const nowPct = ((now.getTime() - midnightA) / dayMs * 100);
+    const nowLine = nowPct >= 0 && nowPct <= 100
+      ? `<div class="now-line" style="left:${nowPct.toFixed(2)}%"><div class="now-dot"></div></div>` : '';
+    barHtml = `
+      <div class="simple-bar-wrap">
+        <div class="simple-bar-track">
+          <div class="simple-bar-fill" style="left:${l}%;width:${w}%"></div>
+          ${nowLine}
+        </div>
+        <div class="simple-bar-labels">
+          <span>${fmtTime(overlap.start, cityA.tz)}</span>
+          <span>${fmtTime(overlap.end, cityA.tz)}</span>
+        </div>
+      </div>`;
+  }
+
+  return `
+<div class="card">
+  <div class="card-summary">
+    <div class="current-times">
+      ${allCities.map((city, i) => `
+        <div class="cur-city">
+          <span class="dot" style="background:${CITY_COLORS[i] ?? CITY_COLORS[CITY_COLORS.length-1]}"></span>
+          ${city.name} <span class="cur-t" id="cur-${i}"></span>
+        </div>`).join('')}
+    </div>
+    ${overlap
+      ? `<div class="overlap-num">${fmtHours(overlapHrs)} overlap</div>`
+      : `<div class="no-overlap-num">No overlap</div>`}
+  </div>
+  <div class="simple-times-block">${timeRows}</div>
+  ${barHtml}
+  <div class="card-actions">
+    <button id="share-btn"    class="action-btn">Share link</button>
+    <button id="dl-btn"       class="action-btn">Download image</button>
+    <button id="copy-img-btn" class="action-btn">Copy image</button>
+  </div>
+</div>`;
+}
+
 // ── Main render ───────────────────────────────────────────────────────────────
 
 function render() {
@@ -630,6 +718,13 @@ function render() {
     window: allWins[i],
     color: CITY_COLORS[i] ?? CITY_COLORS[CITY_COLORS.length - 1]
   }));
+
+  if (viewMode === 'simple') {
+    area.innerHTML = renderSimple(allCities, allWins, overlap, overlapHrs);
+    wireActionBtns();
+    tickLiveTimes(allCities);
+    return;
+  }
 
   // Current times (for display)
   const curTimesHtml = allCities.map((city, i) => `
@@ -682,17 +777,20 @@ function render() {
   </div>
 </div>`;
 
-  document.getElementById('share-btn').addEventListener('click', () => {
+  wireActionBtns();
+  tickLiveTimes(allCities);
+}
+
+function wireActionBtns() {
+  document.getElementById('share-btn')?.addEventListener('click', () => {
     navigator.clipboard.writeText(location.href).then(() => {
       const btn = document.getElementById('share-btn');
       btn.textContent = 'Copied!';
       setTimeout(() => { btn.textContent = 'Share link'; }, 2000);
     });
   });
-  document.getElementById('dl-btn').addEventListener('click', downloadImage);
-  document.getElementById('copy-img-btn').addEventListener('click', copyImageToClipboard);
-
-  tickLiveTimes(allCities);
+  document.getElementById('dl-btn')?.addEventListener('click', downloadImage);
+  document.getElementById('copy-img-btn')?.addEventListener('click', copyImageToClipboard);
 }
 
 function tickLiveTimes(allCities) {
@@ -708,9 +806,17 @@ function tickLiveTimes(allCities) {
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
+  initViewMode();
   updateThemeBtn();
+  updateViewToggle();
+
   document.getElementById('theme-btn').addEventListener('click', toggleTheme);
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateThemeBtn);
+
+  document.getElementById('view-toggle').addEventListener('click', e => {
+    const btn = e.target.closest('.view-btn');
+    if (btn) setViewMode(btn.dataset.mode);
+  });
 
   const pickerA = setupPicker('input-a', 'list-a', city => {
     cityA = city; updateURL(); render();
