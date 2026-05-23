@@ -112,6 +112,21 @@ function shortOffset(tz) {
   return parts.find(p => p.type === 'timeZoneName')?.value ?? '';
 }
 
+function tzAbbr(tz) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz, timeZoneName: 'short'
+  }).formatToParts(new Date());
+  return parts.find(p => p.type === 'timeZoneName')?.value ?? '';
+}
+
+function tzLabel(tz) {
+  const abbr   = tzAbbr(tz);
+  const offset = shortOffset(tz);
+  // Some zones return a GMT offset as their abbreviation (e.g. "GMT+5:30" for IST)
+  // In that case just show the offset once rather than "GMT+5:30 · GMT+5:30"
+  return abbr === offset ? offset : `${abbr} · ${offset}`;
+}
+
 // ── City search ───────────────────────────────────────────────────────────────
 
 // Maps country name aliases → ISO 2-letter code
@@ -183,7 +198,7 @@ function setupPicker(inputId, listId, onSelect) {
     if (!cities.length) { list.hidden = true; return; }
     cities.forEach(c => {
       const li = document.createElement('li');
-      li.innerHTML = `<span class="city-label">${c.name}<span class="city-country">${c.country}</span></span><span class="city-offset">${shortOffset(c.tz)}</span>`;
+      li.innerHTML = `<span class="city-label">${c.name}<span class="city-country">${c.country}</span></span><span class="city-offset">${tzLabel(c.tz)}</span>`;
       li.addEventListener('mousedown', e => { e.preventDefault(); select(c); });
       list.appendChild(li);
     });
@@ -556,7 +571,7 @@ function renderTimeline(now, cityWindows, overlap) {
 
   const rows = cityWindows.map(({ city, window, color }) => `
     <div class="tl-row">
-      <div class="tl-lbl">${city.name}<span class="tl-tz">${shortOffset(city.tz)}</span></div>
+      <div class="tl-lbl">${city.name}<span class="tl-tz">${tzLabel(city.tz)}</span></div>
       <div class="tl-track">
         ${bar(window.start, window.end, color, false)}
         ${overlap ? bar(overlap.start, overlap.end, OVERLAP_COLOR, true) : ''}
@@ -577,7 +592,7 @@ function renderTimeline(now, cityWindows, overlap) {
   ${cityWindows.map(({ city, color }) =>
     `<span class="legend-item">
       <span class="legend-swatch" style="background:${color};opacity:.4"></span>
-      ${city.name} <span class="legend-tz">${shortOffset(city.tz)}</span>
+      ${city.name} <span class="legend-tz">${tzLabel(city.tz)}</span>
     </span>`
   ).join('')}
   <span class="legend-item"><span class="legend-swatch sw-overlap"></span>Overlap</span>
