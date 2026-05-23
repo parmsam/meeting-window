@@ -532,9 +532,17 @@ h1 {
   border-radius: 3px;
 }
 
-.sw-a       { background: var(--a);       opacity: 0.5; }
-.sw-b       { background: var(--b);       opacity: 0.5; }
+.sw-a       { background: var(--a);       opacity: 0.4; }
 .sw-overlap { background: var(--overlap); opacity: 0.85; }
+
+.legend-now {
+  display: inline-block;
+  width: 2px;
+  height: 10px;
+  background: #ef4444;
+  border-radius: 1px;
+  vertical-align: middle;
+}
 
 /* ── Footer ── */
 

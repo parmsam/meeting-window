@@ -532,7 +532,12 @@ function renderTimeline(now, cityWindows, overlap) {
     <div class="tl-track tl-hours">${hourLabels}</div>
   </div>
 </div>
-<p class="tl-caption">${cityA.name} local time &middot; <span id="live-time"></span></p>`;
+<p class="tl-caption">${cityA.name} local time &middot; <span id="live-time"></span></p>
+<div class="legend">
+  <span class="legend-item"><span class="legend-swatch sw-a"></span>Business hours</span>
+  <span class="legend-item"><span class="legend-swatch sw-overlap"></span>Overlap</span>
+  <span class="legend-item"><span class="legend-now"></span>Now</span>
+</div>`;
 }
 
 // ── Main render ───────────────────────────────────────────────────────────────
