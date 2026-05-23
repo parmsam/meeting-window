@@ -470,16 +470,18 @@ async function copyImageToClipboard() {
   if (!canvas) return;
   const btn = document.getElementById('copy-img-btn');
   try {
-    await new Promise((resolve, reject) => {
-      canvas.toBlob(blob => {
-        if (!blob) { reject(new Error('toBlob failed')); return; }
-        navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
-          .then(resolve).catch(reject);
-      }, 'image/png');
-    });
+    // Pass the Promise directly to ClipboardItem — Safari requires clipboard.write()
+    // to be called synchronously within the user gesture, so we cannot await the
+    // blob first; instead we let the browser resolve the Promise internally.
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        'image/png': new Promise((resolve, reject) =>
+          canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('toBlob failed')), 'image/png')
+        )
+      })
+    ]);
     if (btn) { btn.textContent = 'Copied!'; setTimeout(() => { btn.textContent = 'Copy image'; }, 2000); }
   } catch {
-    // Clipboard API not available — fall back to download
     downloadImage();
     if (btn) { btn.textContent = 'Saved instead'; setTimeout(() => { btn.textContent = 'Copy image'; }, 2000); }
   }
