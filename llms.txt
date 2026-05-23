@@ -94,6 +94,29 @@ function meetingOverlap(timezones, date = new Date()) {
 meetingOverlap(['America/New_York', 'Asia/Tokyo', 'Europe/London']);
 ```
 
+## Getting a plot / screenshot
+
+The timeline visualization is rendered client-side. To obtain an image as an agent:
+
+1. Construct the URL with the desired cities encoded in the hash (see Option 1 above).
+2. Load that URL in a headless browser (Puppeteer, Playwright, or any browser tool).
+3. Wait for the `#result` element to contain a `.card` (indicates the result has rendered).
+4. Screenshot the `#result .card` element — it contains the full timeline and overlap summary.
+
+Example Playwright snippet:
+```js
+const { chromium } = require('playwright');
+const browser = await chromium.launch();
+const page    = await browser.newPage();
+await page.goto('https://parmsam.github.io/meeting-window/#New York,US|Tokyo,JP');
+await page.waitForSelector('#result .card');
+const el = page.locator('#result .card');
+await el.screenshot({ path: 'meeting-window.png' });
+await browser.close();
+```
+
+The page also has a built-in "Download image" button that triggers a canvas-rendered PNG — agents with click/interaction capability can invoke that directly.
+
 ## Source
 
 - Repository: https://github.com/parmsam/meeting-window
