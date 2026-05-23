@@ -1,5 +1,32 @@
 'use strict';
 
+// ── Theme ─────────────────────────────────────────────────────────────────────
+
+function isDarkActive() {
+  const stored = document.documentElement.dataset.theme;
+  if (stored === 'dark') return true;
+  if (stored === 'light') return false;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+function updateThemeBtn() {
+  const btn = document.getElementById('theme-btn');
+  if (!btn) return;
+  const dark = isDarkActive();
+  btn.textContent = dark ? '☀' : '☾';
+  btn.title = dark ? 'Switch to light mode' : 'Switch to dark mode';
+  btn.setAttribute('aria-label', btn.title);
+}
+
+function toggleTheme() {
+  const next = isDarkActive() ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  localStorage.setItem('theme', next);
+  updateThemeBtn();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 const WORK_START = 8;
 const WORK_END = 17;
 
@@ -321,6 +348,10 @@ function tickLiveTimes() {
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
+  updateThemeBtn();
+  document.getElementById('theme-btn').addEventListener('click', toggleTheme);
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateThemeBtn);
+
   const pickerA = setupPicker('input-a', 'list-a', city => { cityA = city; render(); });
   const pickerB = setupPicker('input-b', 'list-b', city => { cityB = city; render(); });
 

@@ -5,11 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Meeting Window</title>
   <meta name="description" content="Find the overlapping business hours between two cities worldwide.">
+  <meta name="color-scheme" content="light dark">
   <link rel="stylesheet" href="style.css">
+  <script>
+    // Apply stored theme before paint to avoid flash
+    (function() {
+      const t = localStorage.getItem('theme');
+      if (t) document.documentElement.dataset.theme = t;
+    })();
+  </script>
 </head>
 <body>
   <div id="app">
     <header>
+      <button id="theme-btn" title="Toggle dark mode" aria-label="Toggle dark mode">☾</button>
       <h1>Meeting Window</h1>
       <p class="tagline">Find overlapping 9–5 hours between two cities</p>
     </header>
