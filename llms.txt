@@ -1,0 +1,101 @@
+# Meeting Window
+
+> Find overlapping business hours (8 AM–5 PM) between two or more cities worldwide.
+
+A static web tool hosted on GitHub Pages. No API key required. All data is publicly accessible.
+
+## What it computes
+
+Given a set of cities, it finds the time window where all cities are simultaneously within standard business hours (08:00–17:00 local time). It uses IANA timezone identifiers and accounts for DST automatically.
+
+## Using this tool as an agent
+
+### Option 1 — Construct a shareable URL
+
+Encode cities in the URL hash. Format: `#CityName,CountryCode|CityName,CountryCode|...`
+
+```
+https://parmsam.github.io/meeting-window/#New York,US|Tokyo,JP
+https://parmsam.github.io/meeting-window/#London,GB|Mumbai,IN|Singapore,SG
+```
+
+City names and country codes must match entries in the cities database (see below). URL-encode city names with spaces or special characters.
+
+### Option 2 — Fetch the cities database
+
+All supported cities with their IANA timezone identifiers:
+
+```
+GET https://parmsam.github.io/meeting-window/cities.json
+```
+
+Response format:
+```json
+[
+  { "name": "New York",  "country": "US", "tz": "America/New_York" },
+  { "name": "Tokyo",     "country": "JP", "tz": "Asia/Tokyo" },
+  { "name": "London",    "country": "GB", "tz": "Europe/London" }
+]
+```
+
+### Option 3 — Compute the overlap directly
+
+Use the IANA timezone identifiers from `cities.json` with any timezone-aware library:
+
+1. For each city, find 08:00 and 17:00 local time expressed as UTC timestamps on the current date.
+2. Overlap start = max of all cities' 08:00 UTC values.
+3. Overlap end   = min of all cities' 17:00 UTC values.
+4. If overlap start < overlap end, there is a shared window.
+
+JavaScript (browser or Node.js with built-in Intl):
+```js
+function businessWindowUTC(date, tz) {
+  // Get today's date in the target timezone
+  const dp = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit'
+  }).formatToParts(date);
+  const y = +dp.find(p => p.type === 'year').value;
+  const m = +dp.find(p => p.type === 'month').value;
+  const d = +dp.find(p => p.type === 'day').value;
+
+  // Measure UTC offset via Intl (handles DST + fractional offsets like IST +5:30)
+  const probe = new Date(Date.UTC(y, m - 1, d, 12));
+  const lp = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false
+  }).formatToParts(probe);
+  const localNoon = +lp.find(p => p.type === 'hour').value + +lp.find(p => p.type === 'minute').value / 60;
+  const offset = localNoon - 12; // hours ahead of UTC
+
+  const midnight = Date.UTC(y, m - 1, d, 0);
+  return {
+    start: midnight + (8  - offset) * 3_600_000,
+    end:   midnight + (17 - offset) * 3_600_000,
+  };
+}
+
+function meetingOverlap(timezones, date = new Date()) {
+  const windows = timezones.map(tz => businessWindowUTC(date, tz));
+  const start = Math.max(...windows.map(w => w.start));
+  const end   = Math.min(...windows.map(w => w.end));
+  if (start >= end) return null;
+  return {
+    startUTC: new Date(start).toISOString(),
+    endUTC:   new Date(end).toISOString(),
+    durationHours: (end - start) / 3_600_000,
+    localTimes: timezones.map(tz => ({
+      timezone: tz,
+      start: new Date(start).toLocaleTimeString('en-US', { timeZone: tz, hour: 'numeric', minute: '2-digit', hour12: true }),
+      end:   new Date(end).toLocaleTimeString('en-US', { timeZone: tz, hour: 'numeric', minute: '2-digit', hour12: true }),
+    })),
+  };
+}
+
+// Example
+meetingOverlap(['America/New_York', 'Asia/Tokyo', 'Europe/London']);
+```
+
+## Source
+
+- Repository: https://github.com/parmsam/meeting-window
+- Cities database: https://parmsam.github.io/meeting-window/cities.json
+- Live tool: https://parmsam.github.io/meeting-window/
