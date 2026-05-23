@@ -556,7 +556,7 @@ function renderTimeline(now, cityWindows, overlap) {
 
   const rows = cityWindows.map(({ city, window, color }) => `
     <div class="tl-row">
-      <div class="tl-lbl">${city.name}</div>
+      <div class="tl-lbl">${city.name}<span class="tl-tz">${shortOffset(city.tz)}</span></div>
       <div class="tl-track">
         ${bar(window.start, window.end, color, false)}
         ${overlap ? bar(overlap.start, overlap.end, OVERLAP_COLOR, true) : ''}
@@ -574,7 +574,12 @@ function renderTimeline(now, cityWindows, overlap) {
 </div>
 <p class="tl-caption">${cityA.name} local time &middot; <span id="live-time"></span></p>
 <div class="legend">
-  <span class="legend-item"><span class="legend-swatch sw-a"></span>Business hours</span>
+  ${cityWindows.map(({ city, color }) =>
+    `<span class="legend-item">
+      <span class="legend-swatch" style="background:${color};opacity:.4"></span>
+      ${city.name} <span class="legend-tz">${shortOffset(city.tz)}</span>
+    </span>`
+  ).join('')}
   <span class="legend-item"><span class="legend-swatch sw-overlap"></span>Overlap</span>
   <span class="legend-item"><span class="legend-now"></span>Now</span>
 </div>`;
