@@ -260,6 +260,29 @@ h1 {
 
 .extra-picker-input input:focus { border-color: var(--a); }
 
+.move-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+  margin-bottom: 1px;
+}
+
+.move-btn {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 5px;
+  padding: 0 0.35rem;
+  font-size: 0.65rem;
+  line-height: 1.6;
+  cursor: pointer;
+  color: var(--muted);
+  transition: border-color 0.12s, color 0.12s;
+}
+
+.move-btn:hover:not(:disabled) { border-color: var(--a); color: var(--a); }
+.move-btn:disabled { opacity: 0.25; cursor: default; }
+
 .remove-city-btn {
   flex-shrink: 0;
   background: none;

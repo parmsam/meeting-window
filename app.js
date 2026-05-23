@@ -238,8 +238,8 @@ function colorForSlot(slotIdx) {
 function addExtraCity(autoCity) {
   if (extraCities.length >= MAX_COMP - 1) return;
   const id    = `ex${++extraCount}`;
-  const slot  = extraCities.length; // 0-based index within extras
-  const color = colorForSlot(1 + slot); // slot 0=cityB already taken → extras start at slot 1
+  const slot  = extraCities.length;
+  const color = colorForSlot(1 + slot);
 
   extraCities.push({ id, city: autoCity ?? null });
 
@@ -253,8 +253,14 @@ function addExtraCity(autoCity) {
       <input type="text" id="input-${id}" placeholder="e.g. London" autocomplete="off" spellcheck="false">
       <ul class="picker-list" id="list-${id}" hidden></ul>
     </div>
+    <div class="move-btns">
+      <button class="move-btn move-up"   data-id="${id}" title="Move up">↑</button>
+      <button class="move-btn move-down" data-id="${id}" title="Move down">↓</button>
+    </div>
     <button class="remove-city-btn" title="Remove city">×</button>`;
 
+  row.querySelector('.move-up').addEventListener('click',   () => moveExtraCity(id, -1));
+  row.querySelector('.move-down').addEventListener('click', () => moveExtraCity(id,  1));
   row.querySelector('.remove-city-btn').addEventListener('click', () => removeExtraCity(id));
   container.appendChild(row);
 
@@ -267,12 +273,44 @@ function addExtraCity(autoCity) {
   else document.getElementById(`input-${id}`).focus();
 
   updateAddBtn();
+  updateMoveButtons();
+}
+
+function moveExtraCity(id, direction) {
+  const idx     = extraCities.findIndex(e => e.id === id);
+  const swapIdx = idx + direction;
+  if (swapIdx < 0 || swapIdx >= extraCities.length) return;
+
+  const swapId = extraCities[swapIdx].id;
+
+  // Swap city data between the two entries
+  [extraCities[idx].city, extraCities[swapIdx].city] =
+  [extraCities[swapIdx].city, extraCities[idx].city];
+
+  // Swap displayed input values to match
+  const inputA = document.getElementById(`input-${id}`);
+  const inputB = document.getElementById(`input-${swapId}`);
+  if (inputA && inputB) [inputA.value, inputB.value] = [inputB.value, inputA.value];
+
+  updateMoveButtons();
+  updateURL();
+  render();
+}
+
+function updateMoveButtons() {
+  extraCities.forEach(({ id }, idx) => {
+    const up   = document.querySelector(`.move-up[data-id="${id}"]`);
+    const down = document.querySelector(`.move-down[data-id="${id}"]`);
+    if (up)   up.disabled   = idx === 0;
+    if (down) down.disabled = idx === extraCities.length - 1;
+  });
 }
 
 function removeExtraCity(id) {
   extraCities = extraCities.filter(e => e.id !== id);
   document.querySelector(`[data-extra-id="${id}"]`)?.remove();
   updateAddBtn();
+  updateMoveButtons();
   updateURL();
   render();
 }
