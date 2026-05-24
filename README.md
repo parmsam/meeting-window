@@ -13,9 +13,9 @@ Pick your city and a colleague's city. Meeting Window shows the window of time w
 ## Features
 
 - **Multi-city comparison** — add up to 8 comparison cities; overlap = intersection of all
-- **Date picker** — check overlap on any date, not just today; "Today" button to reset
-- **Custom hours** — adjust business hours beyond the default 9 AM–5 PM
-- **Shareable links** — cities, date, and hours are all encoded in the URL; copy and paste to share
+- **Custom hours** — adjust business hours via the gear icon (default 9 AM–5 PM); persisted across sessions
+- **Time scrubber** — click or drag the timeline to move the "now" line forward or backward; ←/→ arrow keys nudge by 1 hour (Shift: 3 hours); Esc or ↺ Live resets to real time
+- **Shareable links** — cities and hour settings are encoded in the URL; copy and paste to share
 - **Download or copy image** — export the timeline as a PNG to paste into Slack, email, or a doc
 - **Dark mode** — respects system preference with a manual toggle
 - **Country search** — type a country name ("japan", "uk", "india") to filter cities
@@ -28,13 +28,12 @@ Cities are encoded in the URL hash; date and hour settings go in query params. A
 
 ```
 https://parmsam.github.io/meeting-window/#New York,US|Tokyo,JP
-https://parmsam.github.io/meeting-window/?date=2026-06-01&start=9&end=18#London,GB|Mumbai,IN
+https://parmsam.github.io/meeting-window/?start=9&end=18#London,GB|Mumbai,IN
 https://parmsam.github.io/meeting-window/?mode=simple#Singapore,SG|Berlin,DE
 ```
 
 - **Hash** — `#CityName,CountryCode|...` (cities in order, anchor first)
 - `mode=simple` — use the simplified view
-- `date=YYYY-MM-DD` — view overlap for a specific date
 - `start=N&end=N` — custom business hours (24-hour integers, e.g. `start=9&end=18`)
 
 ## For AI agents
