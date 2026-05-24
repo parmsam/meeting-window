@@ -344,20 +344,49 @@ h1 {
   box-shadow: 0 1px 3px rgba(0,0,0,.08);
 }
 
-/* ── Settings row ── */
+/* ── Settings popover ── */
 
-.settings-row {
-  display: flex;
-  gap: 1.25rem;
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
-  align-items: flex-end;
+.settings-wrap {
+  position: relative;
 }
+
+#settings-btn {
+  display: flex;
+  align-items: center;
+  padding: 0.3rem 0.4rem;
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  cursor: pointer;
+  color: var(--muted);
+  transition: border-color 0.12s, color 0.12s;
+}
+
+#settings-btn:hover,
+#settings-btn[aria-expanded="true"] {
+  border-color: var(--a);
+  color: var(--a);
+}
+
+.settings-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  padding: 0.85rem 1rem;
+  z-index: 300;
+  min-width: 220px;
+}
+
+.settings-popover[hidden] { display: none; }
 
 .settings-group {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.4rem;
 }
 
 .settings-lbl {
@@ -368,40 +397,6 @@ h1 {
   color: var(--muted);
 }
 
-.date-wrap {
-  display: flex;
-  gap: 0.35rem;
-  align-items: center;
-}
-
-#date-input {
-  padding: 0.42rem 0.6rem;
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  font-size: 0.82rem;
-  background: var(--card);
-  color: var(--text);
-  outline: none;
-  transition: border-color 0.12s;
-  font-family: inherit;
-}
-
-#date-input:focus { border-color: var(--a); }
-
-.today-btn {
-  background: none;
-  border: 1.5px solid var(--border);
-  border-radius: 7px;
-  padding: 0.4rem 0.6rem;
-  font-size: 0.78rem;
-  cursor: pointer;
-  color: var(--muted);
-  white-space: nowrap;
-  transition: border-color 0.12s, color 0.12s;
-}
-
-.today-btn:hover { border-color: var(--a); color: var(--a); }
-
 .hours-wrap {
   display: flex;
   align-items: center;
@@ -411,6 +406,7 @@ h1 {
 .hours-dash { color: var(--muted); font-size: 0.85rem; }
 
 .hour-select {
+  flex: 1;
   padding: 0.42rem 0.45rem;
   border: 1.5px solid var(--border);
   border-radius: 8px;
@@ -461,7 +457,7 @@ h1 {
 }
 
 .simple-bar-track {
-  height: 10px;
+  height: 12px;
   background: var(--track-bg);
   border-radius: 99px;
   position: relative;
@@ -476,13 +472,19 @@ h1 {
   opacity: 0.85;
 }
 
-.simple-bar-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.65rem;
+.simple-ticks {
+  position: relative;
+  height: 14px;
+  margin-top: 2px;
+}
+
+.simple-tick {
+  position: absolute;
+  font-size: 0.6rem;
   color: var(--muted);
-  margin-top: 0.3rem;
-  font-variant-numeric: tabular-nums;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  user-select: none;
 }
 
 /* ── Result ── */

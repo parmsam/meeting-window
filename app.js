@@ -29,7 +29,6 @@ function toggleTheme() {
 
 let workStart = 8;
 let workEnd   = 17;
-let selectedDate = null; // null = today; Date object = specific day (noon UTC)
 const MAX_COMP = 8; // max comparison cities (plus the anchor = 9 total)
 
 // Colors: index 0 = anchor city (always blue), 1..4 = comparison slots
@@ -366,20 +365,10 @@ function updateAddBtn() {
 
 // ── URL sharing ───────────────────────────────────────────────────────────────
 
-function getTodayStr() {
-  const n = new Date();
-  return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
-}
-
-function dateToISO(d) { return d.toISOString().slice(0, 10); }
-
-function isToday() { return !selectedDate; }
-
 function updateURL() {
   const cities = [cityA, cityB, ...extraCities.map(e => e.city)].filter(Boolean);
   const params = new URLSearchParams();
   if (viewMode === 'simple') params.set('mode', 'simple');
-  if (selectedDate) params.set('date', dateToISO(selectedDate));
   if (workStart !== 8) params.set('start', workStart);
   if (workEnd !== 17)  params.set('end',   workEnd);
   const qs = params.toString() ? '?' + params.toString() : '';
@@ -424,9 +413,9 @@ function buildCanvas() {
     : { bg: '#f8fafc', card: '#ffffff', text: '#0f172a', muted: '#64748b', track: '#f1f5f9' };
 
   const allCities = [cityA, cityB, ...extraCities.map(e => e.city)].filter(Boolean);
-  const refDate   = selectedDate ?? new Date();
-  const windows   = allCities.map(c => getBusinessWindow(refDate, c.tz));
-  const midnightA = localHourToUTC(refDate, 0, cityA.tz).getTime();
+  const now       = new Date();
+  const windows   = allCities.map(c => getBusinessWindow(now, c.tz));
+  const midnightA = localHourToUTC(now, 0, cityA.tz).getTime();
   const dayMs     = 24 * 3600000;
   const pct       = (ms) => Math.max(0, Math.min(1, (ms - midnightA) / dayMs));
 
@@ -583,8 +572,8 @@ async function copyImageToClipboard() {
 
 // ── Timeline ──────────────────────────────────────────────────────────────────
 
-function renderTimeline(refDate, now, cityWindows, overlap) {
-  const midnightA = localHourToUTC(refDate, 0, cityA.tz).getTime();
+function renderTimeline(now, cityWindows, overlap) {
+  const midnightA = localHourToUTC(now, 0, cityA.tz).getTime();
   const dayMs = 24 * 3600000;
 
   function pct(ms) { return ((ms - midnightA) / dayMs * 100); }
@@ -606,7 +595,7 @@ function renderTimeline(refDate, now, cityWindows, overlap) {
   }).join('');
 
   const nowPct = pct(now.getTime());
-  const nowLine = isToday() && (nowPct >= 0 && nowPct <= 100)
+  const nowLine = (nowPct >= 0 && nowPct <= 100)
     ? `<div class="now-line" style="left:${nowPct.toFixed(2)}%"><div class="now-dot"></div></div>`
     : '';
 
@@ -644,8 +633,7 @@ function renderTimeline(refDate, now, cityWindows, overlap) {
 // ── Simple view ───────────────────────────────────────────────────────────────
 
 function renderSimple(allCities, allWins, overlap, overlapHrs) {
-  const now     = new Date();
-  const refDate = selectedDate ?? now;
+  const now = new Date();
 
   const timeRows = allCities.map((city, i) => `
     <div class="simple-row">
@@ -657,26 +645,28 @@ function renderSimple(allCities, allWins, overlap, overlapHrs) {
         : fmtCurrentTime(city.tz)}</span>
     </div>`).join('');
 
-  // Minimal single bar: show where the overlap sits within the anchor's day
+  // Single bar showing overlap position within the anchor's day with hour ticks
   let barHtml = '';
-  if (overlap && cityA) {
-    const midnightA = localHourToUTC(refDate, 0, cityA.tz).getTime();
+  if (cityA) {
+    const midnightA = localHourToUTC(now, 0, cityA.tz).getTime();
     const dayMs = 24 * 3600000;
-    const l = ((overlap.start - midnightA) / dayMs * 100).toFixed(2);
-    const w = ((overlap.end - overlap.start) / dayMs * 100).toFixed(2);
     const nowPct = ((now.getTime() - midnightA) / dayMs * 100);
-    const nowLine = isToday() && nowPct >= 0 && nowPct <= 100
+    const nowLine = nowPct >= 0 && nowPct <= 100
       ? `<div class="now-line" style="left:${nowPct.toFixed(2)}%"><div class="now-dot"></div></div>` : '';
+    const fillHtml = overlap
+      ? `<div class="simple-bar-fill" style="left:${((overlap.start - midnightA) / dayMs * 100).toFixed(2)}%;width:${((overlap.end - overlap.start) / dayMs * 100).toFixed(2)}%"></div>`
+      : '';
+    const ticks = [0, 3, 6, 9, 12, 15, 18, 21, 24].map(h => {
+      const lbl = h === 0 ? '12a' : h < 12 ? `${h}a` : h === 12 ? '12p' : `${h - 12}p`;
+      return `<span class="simple-tick" style="left:${(h / 24 * 100).toFixed(2)}%">${lbl}</span>`;
+    }).join('');
     barHtml = `
       <div class="simple-bar-wrap">
         <div class="simple-bar-track">
-          <div class="simple-bar-fill" style="left:${l}%;width:${w}%"></div>
+          ${fillHtml}
           ${nowLine}
         </div>
-        <div class="simple-bar-labels">
-          <span>${fmtTime(overlap.start, cityA.tz)}</span>
-          <span>${fmtTime(overlap.end, cityA.tz)}</span>
-        </div>
+        <div class="simple-ticks">${ticks}</div>
       </div>`;
   }
 
@@ -715,10 +705,9 @@ function render() {
     return;
   }
 
-  const now     = new Date();
-  const refDate = selectedDate ?? now;
-  const anchorW  = getBusinessWindow(refDate, cityA.tz);
-  const compWins = comp.map(c => getBusinessWindow(refDate, c.tz));
+  const now = new Date();
+  const anchorW  = getBusinessWindow(now, cityA.tz);
+  const compWins = comp.map(c => getBusinessWindow(now, c.tz));
 
   // Global overlap: intersection of anchor + all comparison windows
   const allWins = [anchorW, ...compWins];
@@ -785,7 +774,7 @@ function render() {
     ${summaryHtml}
   </div>
   <div class="card-timeline">
-    ${renderTimeline(refDate, now, cityWindows, overlap)}
+    ${renderTimeline(now, cityWindows, overlap)}
   </div>
   <div class="card-actions">
     <button id="share-btn"    class="action-btn">Share link</button>
@@ -856,19 +845,11 @@ function initSettings() {
     if (!isNaN(le) && le >= 1 && le <= 23 && le > workStart) workEnd = le;
   }
 
-  const dateParam = params.get('date');
-  if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
-    const d = new Date(dateParam + 'T12:00:00Z');
-    if (!isNaN(d.getTime())) selectedDate = d;
-  }
-
   buildHourOptions();
   const startSel = document.getElementById('work-start-select');
   const endSel   = document.getElementById('work-end-select');
-  const dateInp  = document.getElementById('date-input');
   if (startSel) startSel.value = workStart;
   if (endSel)   endSel.value   = workEnd;
-  if (dateInp)  dateInp.value  = selectedDate ? dateToISO(selectedDate) : getTodayStr();
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
@@ -880,6 +861,20 @@ document.addEventListener('DOMContentLoaded', () => {
   updateViewToggle();
 
   document.getElementById('theme-btn').addEventListener('click', toggleTheme);
+
+  const settingsBtn     = document.getElementById('settings-btn');
+  const settingsPopover = document.getElementById('settings-popover');
+  settingsBtn.addEventListener('click', () => {
+    const open = settingsPopover.hidden === false;
+    settingsPopover.hidden = open;
+    settingsBtn.setAttribute('aria-expanded', String(!open));
+  });
+  document.addEventListener('click', e => {
+    if (!settingsBtn.contains(e.target) && !settingsPopover.contains(e.target)) {
+      settingsPopover.hidden = true;
+      settingsBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateThemeBtn);
 
   document.getElementById('view-toggle').addEventListener('click', e => {
@@ -903,25 +898,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('add-city-btn').addEventListener('click', () => addExtraCity());
-
-  document.getElementById('date-input').addEventListener('change', e => {
-    const v = e.target.value;
-    if (!v) {
-      selectedDate = null;
-    } else {
-      const d = new Date(v + 'T12:00:00Z');
-      selectedDate = isNaN(d.getTime()) ? null : d;
-    }
-    updateURL();
-    render();
-  });
-
-  document.getElementById('today-btn').addEventListener('click', () => {
-    selectedDate = null;
-    document.getElementById('date-input').value = getTodayStr();
-    updateURL();
-    render();
-  });
 
   document.getElementById('work-start-select').addEventListener('change', e => {
     workStart = parseInt(e.target.value, 10);
