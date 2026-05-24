@@ -378,7 +378,7 @@ function updateURL() {
   const qs = params.toString() ? '?' + params.toString() : '';
   if (!cities.length) { history.replaceState(null, '', location.pathname + qs); return; }
   const hash = cities.map(c => `${encodeURIComponent(c.name)},${c.country}`).join('|');
-  history.replaceState(null, '', `${qs}#${hash}`);
+  history.replaceState(null, '', location.pathname + qs + '#' + hash);
 }
 
 function parseURL() {
