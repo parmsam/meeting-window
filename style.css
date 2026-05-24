@@ -461,6 +461,8 @@ h1 {
   background: var(--track-bg);
   border-radius: 99px;
   position: relative;
+  cursor: crosshair;
+  user-select: none;
 }
 
 .simple-bar-fill {
@@ -635,6 +637,8 @@ h1 {
   border-radius: 5px;
   position: relative;
   overflow: visible;
+  cursor: crosshair;
+  user-select: none;
 }
 
 .tl-bar {
@@ -656,6 +660,17 @@ h1 {
   background: #ef4444;
   z-index: 10;
   transform: translateX(-1px);
+  cursor: ew-resize;
+}
+
+/* wider grab target */
+.now-line::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -6px;
+  right: -6px;
 }
 
 .now-dot {
@@ -714,6 +729,9 @@ h1 {
 }
 
 .action-btn:hover { border-color: var(--a); color: var(--a); }
+
+.action-btn--live { border-color: #ef4444; color: #ef4444; }
+.action-btn--live:hover { border-color: #ef4444; color: #ef4444; opacity: 0.75; }
 
 /* ── Legend ── */
 

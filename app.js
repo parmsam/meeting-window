@@ -67,6 +67,10 @@ let cityB      = null; // first comparison city (static HTML picker)
 let extraCities = [];  // [{id, city}] for dynamically-added pickers
 let extraCount = 0;
 
+let scrubMs        = null;  // null = live; number = scrubbed UTC time in ms
+let _scrubDragging = false;
+let _scrubTrack    = null;
+
 function allCompCities() {
   return [cityB, ...extraCities.map(e => e.city)].filter(Boolean);
 }
@@ -690,6 +694,7 @@ function renderSimple(allCities, allWins, overlap, overlapHrs) {
     <button id="share-btn"    class="action-btn">Share link</button>
     <button id="dl-btn"       class="action-btn">Download image</button>
     <button id="copy-img-btn" class="action-btn">Copy image</button>
+    <button id="reset-live-btn" class="action-btn action-btn--live" hidden>↺ Live</button>
   </div>
 </div>`;
 }
@@ -697,6 +702,7 @@ function renderSimple(allCities, allWins, overlap, overlapHrs) {
 // ── Main render ───────────────────────────────────────────────────────────────
 
 function render() {
+  scrubMs = null; // any full re-render returns to live
   const area = document.getElementById('result');
   const comp = allCompCities();
 
@@ -728,6 +734,7 @@ function render() {
   if (viewMode === 'simple') {
     area.innerHTML = renderSimple(allCities, allWins, overlap, overlapHrs);
     wireActionBtns();
+    wireTimeline();
     tickLiveTimes(allCities);
     return;
   }
@@ -780,10 +787,12 @@ function render() {
     <button id="share-btn"    class="action-btn">Share link</button>
     <button id="dl-btn"       class="action-btn">Download image</button>
     <button id="copy-img-btn" class="action-btn">Copy image</button>
+    <button id="reset-live-btn" class="action-btn action-btn--live" hidden>↺ Live</button>
   </div>
 </div>`;
 
   wireActionBtns();
+  wireTimeline();
   tickLiveTimes(allCities);
 }
 
@@ -797,16 +806,67 @@ function wireActionBtns() {
   });
   document.getElementById('dl-btn')?.addEventListener('click', downloadImage);
   document.getElementById('copy-img-btn')?.addEventListener('click', copyImageToClipboard);
+  document.getElementById('reset-live-btn')?.addEventListener('click', () => {
+    scrubMs = null;
+    render();
+  });
 }
 
+function getScrubTime() { return scrubMs ?? Date.now(); }
+
 function tickLiveTimes(allCities) {
+  const t = getScrubTime();
   allCities = allCities ?? [cityA, ...allCompCities()];
   allCities.forEach((city, i) => {
     const el = document.getElementById(`cur-${i}`);
-    if (el && city) el.textContent = fmtCurrentTime(city.tz);
+    if (el && city) el.textContent = fmtTime(t, city.tz);
   });
   const lt = document.getElementById('live-time');
-  if (lt && cityA) lt.textContent = fmtCurrentTime(cityA.tz);
+  if (lt && cityA) lt.textContent = fmtTime(t, cityA.tz);
+}
+
+// ── Scrubber ──────────────────────────────────────────────────────────────────
+
+function _doScrub(clientX, trackEl) {
+  if (!cityA) return;
+  const rect = trackEl.getBoundingClientRect();
+  const frac = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+  const midnightA = localHourToUTC(new Date(), 0, cityA.tz).getTime();
+  scrubMs = midnightA + frac * 24 * 3600000;
+  _applyNowPos((frac * 100).toFixed(2) + '%');
+}
+
+function _scrubByHours(delta) {
+  if (!cityA) return;
+  const base = scrubMs ?? Date.now();
+  const midnightA = localHourToUTC(new Date(), 0, cityA.tz).getTime();
+  const dayMs = 24 * 3600000;
+  const next = Math.max(midnightA, Math.min(midnightA + dayMs, base + delta * 3600000));
+  scrubMs = next;
+  _applyNowPos(((next - midnightA) / dayMs * 100).toFixed(2) + '%');
+}
+
+function _applyNowPos(pct) {
+  document.querySelectorAll('.now-line').forEach(el => el.style.left = pct);
+  const btn = document.getElementById('reset-live-btn');
+  if (btn) btn.hidden = false;
+  tickLiveTimes();
+}
+
+function wireTimeline() {
+  document.querySelectorAll('.tl-track:not(.tl-hours), .simple-bar-track').forEach(track => {
+    track.addEventListener('mousedown', e => {
+      e.preventDefault();
+      _scrubDragging = true;
+      _scrubTrack = track;
+      _doScrub(e.clientX, track);
+    });
+    track.addEventListener('touchstart', e => {
+      _scrubDragging = true;
+      _scrubTrack = track;
+      _doScrub(e.touches[0].clientX, track);
+    }, { passive: true });
+  });
 }
 
 // ── Settings ──────────────────────────────────────────────────────────────────
@@ -932,8 +992,35 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   render();
+  // Global scrub listeners (attached once)
+  document.addEventListener('mousemove', e => {
+    if (!_scrubDragging || !_scrubTrack) return;
+    _doScrub(e.clientX, _scrubTrack);
+  });
+  document.addEventListener('mouseup', () => {
+    _scrubDragging = false;
+    _scrubTrack = null;
+  });
+  document.addEventListener('touchmove', e => {
+    if (!_scrubDragging || !_scrubTrack) return;
+    _doScrub(e.touches[0].clientX, _scrubTrack);
+  }, { passive: true });
+  document.addEventListener('touchend', () => {
+    _scrubDragging = false;
+    _scrubTrack = null;
+  });
+
+  // Arrow keys: ←/→ nudge scrub by 1 hour; Shift+arrow = 3 h
+  document.addEventListener('keydown', e => {
+    if (!cityA || allCompCities().length === 0) return;
+    if (document.activeElement?.matches('input, select, textarea')) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); _scrubByHours( e.shiftKey ? 3 : 1); }
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); _scrubByHours(e.shiftKey ? -3 : -1); }
+    if (e.key === 'Escape' && scrubMs) { scrubMs = null; render(); }
+  });
+
   setInterval(() => {
     tickLiveTimes();
-    if (cityA && allCompCities().length > 0) render();
+    if (cityA && allCompCities().length > 0 && !scrubMs) render();
   }, 60000);
 });
