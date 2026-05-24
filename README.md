@@ -1,6 +1,6 @@
 # Meeting Window
 
-Find overlapping business hours between two or more cities worldwide.
+Find overlapping business hours (default 9 AM–5 PM) between two or more cities worldwide.
 
 **Live:** https://parmsam.github.io/meeting-window/
 
@@ -14,7 +14,7 @@ Pick your city and a colleague's city. Meeting Window shows the window of time w
 
 - **Multi-city comparison** — add up to 8 comparison cities; overlap = intersection of all
 - **Date picker** — check overlap on any date, not just today; "Today" button to reset
-- **Custom hours** — adjust business hours beyond the default 8 AM–5 PM
+- **Custom hours** — adjust business hours beyond the default 9 AM–5 PM
 - **Shareable links** — cities, date, and hours are all encoded in the URL; copy and paste to share
 - **Download or copy image** — export the timeline as a PNG to paste into Slack, email, or a doc
 - **Dark mode** — respects system preference with a manual toggle

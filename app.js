@@ -27,7 +27,7 @@ function toggleTheme() {
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-let workStart = 8;
+let workStart = 9;
 let workEnd   = 17;
 const MAX_COMP = 8; // max comparison cities (plus the anchor = 9 total)
 
@@ -373,7 +373,7 @@ function updateURL() {
   const cities = [cityA, cityB, ...extraCities.map(e => e.city)].filter(Boolean);
   const params = new URLSearchParams();
   if (viewMode === 'simple') params.set('mode', 'simple');
-  if (workStart !== 8) params.set('start', workStart);
+  if (workStart !== 9) params.set('start', workStart);
   if (workEnd !== 17)  params.set('end',   workEnd);
   const qs = params.toString() ? '?' + params.toString() : '';
   if (!cities.length) { history.replaceState(null, '', location.pathname + qs); return; }
@@ -416,11 +416,11 @@ function buildCanvas() {
     ? { bg: '#0f172a', card: '#1e293b', text: '#f1f5f9', muted: '#94a3b8', track: '#111827' }
     : { bg: '#f8fafc', card: '#ffffff', text: '#0f172a', muted: '#64748b', track: '#f1f5f9' };
 
-  const allCities    = [cityA, cityB, ...extraCities.map(e => e.city)].filter(Boolean);
-  const now          = new Date();
-  const anchorMidnight = localHourToUTC(now, 0, cityA.tz);
-  const windows      = allCities.map(c => getBusinessWindow(anchorMidnight, c.tz));
-  const midnightA    = anchorMidnight.getTime();
+  const allCities  = [cityA, cityB, ...extraCities.map(e => e.city)].filter(Boolean);
+  const now        = new Date();
+  const anchorNoon = localHourToUTC(now, 12, cityA.tz);
+  const windows    = allCities.map(c => getBusinessWindow(anchorNoon, c.tz));
+  const midnightA  = localHourToUTC(now, 0, cityA.tz).getTime();
   const dayMs     = 24 * 3600000;
   const pct       = (ms) => Math.max(0, Math.min(1, (ms - midnightA) / dayMs));
 
@@ -713,12 +713,12 @@ function render() {
   }
 
   const now = new Date();
-  // Anchor all business-hour calculations to the anchor city's current local date.
-  // Without this, cities already in "tomorrow" (e.g. Edinburgh at 1 AM while NY is at 8 PM)
-  // compute their hours for the next calendar day, placing their bar entirely off the chart.
-  const anchorMidnight = localHourToUTC(now, 0, cityA.tz);
-  const anchorW  = getBusinessWindow(anchorMidnight, cityA.tz);
-  const compWins = comp.map(c => getBusinessWindow(anchorMidnight, c.tz));
+  // Use the anchor city's local noon as the reference for all business-hour calculations.
+  // Midnight fails for cities behind the anchor (e.g. Dallas is still "yesterday" at
+  // NY midnight). Noon is always the same calendar date across all practical timezones.
+  const anchorNoon = localHourToUTC(now, 12, cityA.tz);
+  const anchorW  = getBusinessWindow(anchorNoon, cityA.tz);
+  const compWins = comp.map(c => getBusinessWindow(anchorNoon, c.tz));
 
   // Global overlap: intersection of anchor + all comparison windows
   const allWins = [anchorW, ...compWins];
