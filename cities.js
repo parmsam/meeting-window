@@ -1,81 +1,81 @@
 const CITIES = [
   // North America
-  { name: "New York",       country: "US", tz: "America/New_York" },
-  { name: "Los Angeles",    country: "US", tz: "America/Los_Angeles" },
-  { name: "Chicago",        country: "US", tz: "America/Chicago" },
-  { name: "Houston",        country: "US", tz: "America/Chicago" },
-  { name: "Phoenix",        country: "US", tz: "America/Phoenix" },
-  { name: "Philadelphia",   country: "US", tz: "America/New_York" },
-  { name: "San Antonio",    country: "US", tz: "America/Chicago" },
-  { name: "San Diego",      country: "US", tz: "America/Los_Angeles" },
-  { name: "Dallas",         country: "US", tz: "America/Chicago" },
-  { name: "San Jose",       country: "US", tz: "America/Los_Angeles" },
-  { name: "Austin",         country: "US", tz: "America/Chicago" },
-  { name: "Seattle",        country: "US", tz: "America/Los_Angeles" },
-  { name: "Denver",         country: "US", tz: "America/Denver" },
-  { name: "Boston",         country: "US", tz: "America/New_York" },
-  { name: "Atlanta",        country: "US", tz: "America/New_York" },
-  { name: "Miami",          country: "US", tz: "America/New_York" },
-  { name: "Minneapolis",    country: "US", tz: "America/Chicago" },
-  { name: "Portland",       country: "US", tz: "America/Los_Angeles" },
-  { name: "Las Vegas",      country: "US", tz: "America/Los_Angeles" },
-  { name: "Detroit",        country: "US", tz: "America/Detroit" },
-  { name: "Nashville",      country: "US", tz: "America/Chicago" },
-  { name: "Charlotte",      country: "US", tz: "America/New_York" },
-  { name: "Raleigh",        country: "US", tz: "America/New_York" },
-  { name: "Salt Lake City", country: "US", tz: "America/Denver" },
-  { name: "Honolulu",       country: "US", tz: "Pacific/Honolulu" },
-  { name: "Anchorage",      country: "US", tz: "America/Anchorage" },
+  { name: "New York",       country: "US", state: "NY", tz: "America/New_York" },
+  { name: "Los Angeles",    country: "US", state: "CA", tz: "America/Los_Angeles" },
+  { name: "Chicago",        country: "US", state: "IL", tz: "America/Chicago" },
+  { name: "Houston",        country: "US", state: "TX", tz: "America/Chicago" },
+  { name: "Phoenix",        country: "US", state: "AZ", tz: "America/Phoenix" },
+  { name: "Philadelphia",   country: "US", state: "PA", tz: "America/New_York" },
+  { name: "San Antonio",    country: "US", state: "TX", tz: "America/Chicago" },
+  { name: "San Diego",      country: "US", state: "CA", tz: "America/Los_Angeles" },
+  { name: "Dallas",         country: "US", state: "TX", tz: "America/Chicago" },
+  { name: "San Jose",       country: "US", state: "CA", tz: "America/Los_Angeles" },
+  { name: "Austin",         country: "US", state: "TX", tz: "America/Chicago" },
+  { name: "Seattle",        country: "US", state: "WA", tz: "America/Los_Angeles" },
+  { name: "Denver",         country: "US", state: "CO", tz: "America/Denver" },
+  { name: "Boston",         country: "US", state: "MA", tz: "America/New_York" },
+  { name: "Atlanta",        country: "US", state: "GA", tz: "America/New_York" },
+  { name: "Miami",          country: "US", state: "FL", tz: "America/New_York" },
+  { name: "Minneapolis",    country: "US", state: "MN", tz: "America/Chicago" },
+  { name: "Portland",       country: "US", state: "OR", tz: "America/Los_Angeles" },
+  { name: "Las Vegas",      country: "US", state: "NV", tz: "America/Los_Angeles" },
+  { name: "Detroit",        country: "US", state: "MI", tz: "America/Detroit" },
+  { name: "Nashville",      country: "US", state: "TN", tz: "America/Chicago" },
+  { name: "Charlotte",      country: "US", state: "NC", tz: "America/New_York" },
+  { name: "Raleigh",        country: "US", state: "NC", tz: "America/New_York" },
+  { name: "Salt Lake City", country: "US", state: "UT", tz: "America/Denver" },
+  { name: "Honolulu",       country: "US", state: "HI", tz: "Pacific/Honolulu" },
+  { name: "Anchorage",      country: "US", state: "AK", tz: "America/Anchorage" },
   // Additional US cities — all 50 states + DC represented
-  { name: "Albuquerque",    country: "US", tz: "America/Denver" },       // NM
-  { name: "Baltimore",      country: "US", tz: "America/New_York" },     // MD
-  { name: "Bangor",         country: "US", tz: "America/New_York" },     // ME
-  { name: "Billings",       country: "US", tz: "America/Denver" },       // MT
-  { name: "Birmingham",     country: "US", tz: "America/Chicago" },      // AL
-  { name: "Boise",          country: "US", tz: "America/Boise" },        // ID
-  { name: "Buffalo",        country: "US", tz: "America/New_York" },     // NY
-  { name: "Burlington",     country: "US", tz: "America/New_York" },     // VT
-  { name: "Charleston",     country: "US", tz: "America/New_York" },     // WV / SC
-  { name: "Cheyenne",       country: "US", tz: "America/Denver" },       // WY
-  { name: "Cincinnati",     country: "US", tz: "America/New_York" },     // OH
-  { name: "Cleveland",      country: "US", tz: "America/New_York" },     // OH
-  { name: "Columbia",       country: "US", tz: "America/New_York" },     // SC
-  { name: "Columbus",       country: "US", tz: "America/New_York" },     // OH
-  { name: "Des Moines",     country: "US", tz: "America/Chicago" },      // IA
-  { name: "El Paso",        country: "US", tz: "America/Denver" },       // TX (Mountain Time)
-  { name: "Fargo",          country: "US", tz: "America/Chicago" },      // ND
-  { name: "Grand Rapids",   country: "US", tz: "America/Detroit" },      // MI
-  { name: "Hartford",       country: "US", tz: "America/New_York" },     // CT
-  { name: "Indianapolis",   country: "US", tz: "America/Indiana/Indianapolis" }, // IN
-  { name: "Jackson",        country: "US", tz: "America/Chicago" },      // MS
-  { name: "Jacksonville",   country: "US", tz: "America/New_York" },     // FL
-  { name: "Kansas City",    country: "US", tz: "America/Chicago" },      // MO/KS
-  { name: "Lexington",      country: "US", tz: "America/Kentucky/Louisville" }, // KY
-  { name: "Little Rock",    country: "US", tz: "America/Chicago" },      // AR
-  { name: "Louisville",     country: "US", tz: "America/Kentucky/Louisville" }, // KY
-  { name: "Manchester",     country: "US", tz: "America/New_York" },     // NH
-  { name: "Memphis",        country: "US", tz: "America/Chicago" },      // TN
-  { name: "Milwaukee",      country: "US", tz: "America/Chicago" },      // WI
-  { name: "New Orleans",    country: "US", tz: "America/Chicago" },      // LA
-  { name: "Newark",         country: "US", tz: "America/New_York" },     // NJ
-  { name: "Oklahoma City",  country: "US", tz: "America/Chicago" },      // OK
-  { name: "Omaha",          country: "US", tz: "America/Chicago" },      // NE
-  { name: "Orlando",        country: "US", tz: "America/New_York" },     // FL
-  { name: "Pittsburgh",     country: "US", tz: "America/New_York" },     // PA
-  { name: "Providence",     country: "US", tz: "America/New_York" },     // RI
-  { name: "Reno",           country: "US", tz: "America/Los_Angeles" },  // NV
-  { name: "Richmond",       country: "US", tz: "America/New_York" },     // VA
-  { name: "Sacramento",     country: "US", tz: "America/Los_Angeles" },  // CA
-  { name: "San Francisco",  country: "US", tz: "America/Los_Angeles" },  // CA
-  { name: "Sioux Falls",    country: "US", tz: "America/Chicago" },      // SD
-  { name: "Spokane",        country: "US", tz: "America/Los_Angeles" },  // WA
-  { name: "St. Louis",      country: "US", tz: "America/Chicago" },      // MO
-  { name: "Tampa",          country: "US", tz: "America/New_York" },     // FL
-  { name: "Tucson",         country: "US", tz: "America/Phoenix" },      // AZ
-  { name: "Virginia Beach", country: "US", tz: "America/New_York" },     // VA
-  { name: "Washington DC",  country: "US", tz: "America/New_York" },     // DC
-  { name: "Wichita",        country: "US", tz: "America/Chicago" },      // KS
-  { name: "Wilmington",     country: "US", tz: "America/New_York" },     // DE
+  { name: "Albuquerque",    country: "US", state: "NM", tz: "America/Denver" },
+  { name: "Baltimore",      country: "US", state: "MD", tz: "America/New_York" },
+  { name: "Bangor",         country: "US", state: "ME", tz: "America/New_York" },
+  { name: "Billings",       country: "US", state: "MT", tz: "America/Denver" },
+  { name: "Birmingham",     country: "US", state: "AL", tz: "America/Chicago" },
+  { name: "Boise",          country: "US", state: "ID", tz: "America/Boise" },
+  { name: "Buffalo",        country: "US", state: "NY", tz: "America/New_York" },
+  { name: "Burlington",     country: "US", state: "VT", tz: "America/New_York" },
+  { name: "Charleston",     country: "US", state: "WV", tz: "America/New_York" },
+  { name: "Cheyenne",       country: "US", state: "WY", tz: "America/Denver" },
+  { name: "Cincinnati",     country: "US", state: "OH", tz: "America/New_York" },
+  { name: "Cleveland",      country: "US", state: "OH", tz: "America/New_York" },
+  { name: "Columbia",       country: "US", state: "SC", tz: "America/New_York" },
+  { name: "Columbus",       country: "US", state: "OH", tz: "America/New_York" },
+  { name: "Des Moines",     country: "US", state: "IA", tz: "America/Chicago" },
+  { name: "El Paso",        country: "US", state: "TX", tz: "America/Denver" },
+  { name: "Fargo",          country: "US", state: "ND", tz: "America/Chicago" },
+  { name: "Grand Rapids",   country: "US", state: "MI", tz: "America/Detroit" },
+  { name: "Hartford",       country: "US", state: "CT", tz: "America/New_York" },
+  { name: "Indianapolis",   country: "US", state: "IN", tz: "America/Indiana/Indianapolis" },
+  { name: "Jackson",        country: "US", state: "MS", tz: "America/Chicago" },
+  { name: "Jacksonville",   country: "US", state: "FL", tz: "America/New_York" },
+  { name: "Kansas City",    country: "US", state: "MO", tz: "America/Chicago" },
+  { name: "Lexington",      country: "US", state: "KY", tz: "America/Kentucky/Louisville" },
+  { name: "Little Rock",    country: "US", state: "AR", tz: "America/Chicago" },
+  { name: "Louisville",     country: "US", state: "KY", tz: "America/Kentucky/Louisville" },
+  { name: "Manchester",     country: "US", state: "NH", tz: "America/New_York" },
+  { name: "Memphis",        country: "US", state: "TN", tz: "America/Chicago" },
+  { name: "Milwaukee",      country: "US", state: "WI", tz: "America/Chicago" },
+  { name: "New Orleans",    country: "US", state: "LA", tz: "America/Chicago" },
+  { name: "Newark",         country: "US", state: "NJ", tz: "America/New_York" },
+  { name: "Oklahoma City",  country: "US", state: "OK", tz: "America/Chicago" },
+  { name: "Omaha",          country: "US", state: "NE", tz: "America/Chicago" },
+  { name: "Orlando",        country: "US", state: "FL", tz: "America/New_York" },
+  { name: "Pittsburgh",     country: "US", state: "PA", tz: "America/New_York" },
+  { name: "Providence",     country: "US", state: "RI", tz: "America/New_York" },
+  { name: "Reno",           country: "US", state: "NV", tz: "America/Los_Angeles" },
+  { name: "Richmond",       country: "US", state: "VA", tz: "America/New_York" },
+  { name: "Sacramento",     country: "US", state: "CA", tz: "America/Los_Angeles" },
+  { name: "San Francisco",  country: "US", state: "CA", tz: "America/Los_Angeles" },
+  { name: "Sioux Falls",    country: "US", state: "SD", tz: "America/Chicago" },
+  { name: "Spokane",        country: "US", state: "WA", tz: "America/Los_Angeles" },
+  { name: "St. Louis",      country: "US", state: "MO", tz: "America/Chicago" },
+  { name: "Tampa",          country: "US", state: "FL", tz: "America/New_York" },
+  { name: "Tucson",         country: "US", state: "AZ", tz: "America/Phoenix" },
+  { name: "Virginia Beach", country: "US", state: "VA", tz: "America/New_York" },
+  { name: "Washington DC",  country: "US", state: "DC", tz: "America/New_York" },
+  { name: "Wichita",        country: "US", state: "KS", tz: "America/Chicago" },
+  { name: "Wilmington",     country: "US", state: "DE", tz: "America/New_York" },
   { name: "Toronto",        country: "CA", tz: "America/Toronto" },
   { name: "Vancouver",      country: "CA", tz: "America/Vancouver" },
   { name: "Montreal",       country: "CA", tz: "America/Toronto" },
