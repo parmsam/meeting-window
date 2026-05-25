@@ -251,6 +251,16 @@ function guessUserCity() {
 
 // ── Autocomplete picker ───────────────────────────────────────────────────────
 
+const POPULAR_CITY_NAMES = [
+  'New York', 'Los Angeles', 'London', 'Tokyo', 'Sydney',
+  'Toronto', 'Dubai', 'Singapore', 'Paris', 'Chicago',
+  'Mumbai', 'São Paulo', 'Berlin', 'Seoul', 'Mexico City',
+];
+
+function popularCities() {
+  return POPULAR_CITY_NAMES.map(n => CITIES.find(c => c.name === n)).filter(Boolean);
+}
+
 function setupPicker(inputId, listId, onSelect) {
   const input = document.getElementById(inputId);
   const list  = document.getElementById(listId);
@@ -261,9 +271,15 @@ function setupPicker(inputId, listId, onSelect) {
 
   const displayName = (city) => city ? `${city.name}, ${city.country}` : '';
 
-  function renderList(cities) {
+  function renderList(cities, label) {
     list.innerHTML = '';
     if (!cities.length) { list.hidden = true; return; }
+    if (label) {
+      const hdr = document.createElement('li');
+      hdr.className = 'ac-group-label';
+      hdr.textContent = label;
+      list.appendChild(hdr);
+    }
     cities.forEach(c => {
       const li = document.createElement('li');
       li.innerHTML = `<span class="city-label">${c.name}<span class="city-country">${c.country}</span></span><span class="city-offset">${tzLabel(c.tz)}</span>`;
@@ -282,7 +298,7 @@ function setupPicker(inputId, listId, onSelect) {
   }
 
   function highlight(idx) {
-    [...list.querySelectorAll('li')].forEach((li, i) =>
+    [...list.querySelectorAll('li:not(.ac-group-label)')].forEach((li, i) =>
       li.classList.toggle('active', i === idx));
   }
 
@@ -292,6 +308,7 @@ function setupPicker(inputId, listId, onSelect) {
   });
   input.addEventListener('focus', () => {
     if (input.value.trim()) renderList(searchCities(input.value));
+    else renderList(popularCities(), 'Popular');
   });
   input.addEventListener('blur', () => {
     setTimeout(() => {
@@ -300,11 +317,11 @@ function setupPicker(inputId, listId, onSelect) {
     }, 150);
   });
   input.addEventListener('keydown', e => {
-    const items = [...list.querySelectorAll('li')];
+    const items = [...list.querySelectorAll('li:not(.ac-group-label)')];
     if (!items.length) return;
     if (e.key === 'ArrowDown') { e.preventDefault(); activeIdx = Math.min(activeIdx + 1, items.length - 1); highlight(activeIdx); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); activeIdx = Math.max(activeIdx - 1, 0); highlight(activeIdx); }
-    else if (e.key === 'Enter' && activeIdx >= 0) { const c = searchCities(input.value); if (c[activeIdx]) select(c[activeIdx]); }
+    else if (e.key === 'Enter' && activeIdx >= 0) { items[activeIdx]?.dispatchEvent(new MouseEvent('mousedown')); }
     else if (e.key === 'Escape') { list.hidden = true; input.blur(); }
   });
 

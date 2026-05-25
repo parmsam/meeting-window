@@ -194,6 +194,17 @@ h1 {
 .picker-list li:hover,
 .picker-list li.active { background: var(--hover-bg); }
 
+.picker-list li.ac-group-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.4rem 0.8rem 0.2rem;
+  cursor: default;
+  pointer-events: none;
+}
+
 .city-label { flex: 1; }
 
 .city-country {
