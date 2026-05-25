@@ -227,6 +227,21 @@ function searchCities(q) {
     if (resolvedCC) return c.country === resolvedCC;
     return c.name.toLowerCase().includes(lq);
   });
+
+  // Partial state-name prefix fallback — handles typing "cali…" before reaching the exact alias
+  if (!matches.length && !resolvedCC && lq.length >= 3) {
+    const prefixCodes = new Set(
+      Object.entries(STATE_ALIASES)
+        .filter(([k]) => k.length > 2 && k.startsWith(lq))
+        .map(([, v]) => v)
+    );
+    if (prefixCodes.size) {
+      return CITIES.filter(c => prefixCodes.has(c.state))
+                   .sort((a, b) => a.name.localeCompare(b.name))
+                   .slice(0, 8);
+    }
+  }
+
   matches.sort((a, b) => {
     if (resolvedCC) return a.name.localeCompare(b.name);
     const aS = a.name.toLowerCase().startsWith(lq);
